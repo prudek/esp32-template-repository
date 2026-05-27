@@ -19,7 +19,7 @@ jobs:
           - target: esp32s3
             platform_label: esp32-s3-pico
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Build ESP-IDF project
         uses: espressif/esp-idf-ci-action@v1
         with:

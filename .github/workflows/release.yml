@@ -17,7 +17,7 @@ jobs:
       release_version: ${{ steps.release_version.outputs.release_version }}
       release_tag: ${{ steps.release_version.outputs.release_tag }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Validate release version
         id: release_version
         shell: bash
@@ -58,7 +58,7 @@ jobs:
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Build release firmware
         uses: espressif/esp-idf-ci-action@v1
         with:
@@ -104,7 +104,7 @@ jobs:
     env:
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
       - name: Download platform packages
         uses: actions/download-artifact@v4
         with:
