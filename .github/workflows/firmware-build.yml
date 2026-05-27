@@ -1,0 +1,62 @@
+name: Firmware Build
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - 'firmware/**'
+      - '.github/workflows/firmware-build.yml'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - target: esp32
+            platform_label: esp32-esp-wroom-32
+          - target: esp32s3
+            platform_label: esp32-s3-pico
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build ESP-IDF project
+        uses: espressif/esp-idf-ci-action@v1
+        with:
+          esp_idf_version: release-v5.4
+          target: ${{ matrix.target }}
+          path: firmware
+          command: |
+            idf.py --version
+            idf.py build
+      - name: Package firmware artifacts
+        if: always()
+        run: |
+          TARGET="${{ matrix.target }}"
+          case "$TARGET" in
+            esp32) PLATFORM_LABEL="esp32-esp-wroom-32" ;;
+            esp32s3) PLATFORM_LABEL="esp32-s3-pico" ;;
+            *) PLATFORM_LABEL="$TARGET" ;;
+          esac
+          python3 tools/release/make_firmware_manifest.py firmware/build VERSION "$TARGET" "$PLATFORM_LABEL" > firmware/build/manifest.json || true
+      - name: Verify required build artifacts
+        if: success()
+        run: |
+          test -f firmware/build/bootloader/bootloader.bin
+          test -f firmware/build/partition_table/partition-table.bin
+          ls firmware/build/*.bin >/dev/null
+          ls firmware/build/*.elf >/dev/null
+      - name: Upload build artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: firmware-${{ matrix.target }}-${{ matrix.platform_label }}
+          path: |
+            firmware/build/*.bin
+            firmware/build/*.elf
+            firmware/build/*.map
+            firmware/build/bootloader/*.bin
+            firmware/build/partition_table/*.bin
+            firmware/build/manifest.json
+            firmware/build/log/*
+          if-no-files-found: warn

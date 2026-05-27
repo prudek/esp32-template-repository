@@ -1,0 +1,13 @@
+name: Agent Review Checklist
+on:
+  pull_request:
+  workflow_dispatch:
+jobs:
+  checklist:
+    runs-on: ubuntu-latest
+    env:
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    steps:
+      - uses: actions/checkout@v4
+      - name: Print agent review checklist
+        run: cat .codex/review-checklists.md
