@@ -9,6 +9,7 @@ static const char *TAG = "main";
 void app_main(void)
 {
     ESP_LOGI(TAG, "Starting ESP32 agent-ready firmware baseline");
+    ESP_LOGI(TAG, "E2E template smoke run: boot path reached");
     const esp_err_t diagnostics_err = diagnostics_log_boot_banner();
     if (diagnostics_err != ESP_OK) {
         ESP_LOGE(TAG, "Diagnostics initialization failed: %s", esp_err_to_name(diagnostics_err));
